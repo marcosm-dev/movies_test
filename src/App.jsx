@@ -1,10 +1,19 @@
+import React from 'react'
+import { Container, Typography } from '@mui/material'
 import { useState } from 'react'
-
+import { MoviesProvider } from './context/MoviesProvider'
 function App() {
+
   return (
-    <div className="App">
-			Movies
-    </div>
+		<MoviesProvider>
+				<Container>
+					<header>
+						<Typography >
+								Movies
+						</Typography>
+					</header>
+				</Container>
+		</MoviesProvider>
   )
 }
 

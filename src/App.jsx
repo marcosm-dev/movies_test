@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import { Container, Typography, Grid, Box } from '@mui/material';
 import { MoviesProvider } from './context/MoviesProvider';
+import { AuthProvider } from './context/AuthProvider';
 import AppLayout from './components/AppLayout';
 import MoviesPage from './components/MoviesPage';
 import MoviePage from './components/MoviePage';
@@ -13,6 +14,7 @@ function App() {
 		<Router>
 		<Container>
 			<Box>
+			<AuthProvider>
 				<MoviesProvider>
 					<Routes>
 						<Route path='/' element={<AppLayout />}>
@@ -22,6 +24,7 @@ function App() {
 						</Route>
 					</Routes>
 				</MoviesProvider>
+			</AuthProvider>
 			</Box>
 		</Container>
 		</Router>

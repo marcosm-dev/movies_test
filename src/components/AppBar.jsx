@@ -20,59 +20,28 @@ import {
 import LoginPage from './LoginPage';
 
 const AppBarPage = () => {
-	const { open, setOpen } = useAuth();
+	const { open, setOpen, handleClick } = useAuth();
 	const { VITE_API_URI, VITE_API_KEY } = import.meta.env;
 	const session = localStorage.getItem('SessionHandle');
 	const token = localStorage.getItem('token');
 	const navigate = useNavigate();
   const [ anchorEl, setAnchorEl ] = useState(null);
-  const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 	const sessionHandle = useMemo(() => !!session, [session])
 	const userToken = useMemo(() => !!token, [token])
-
-	async function logout () {
-		const params = { session_id: session };
-		const { data } = await axios.delete(`${VITE_API_URI}/authentication/session?api_key=${VITE_API_KEY}`, {
-			params,
-		});
-		localStorage.clear();
-		return data;
-	}
-
-	const handleTitleClick = () => {
-		console.log('title')
-	}
-
-	const handleClick = async () => {
-		if (sessionHandle) {
-			const data = await logout()
-			if (data.success) setOpen(true);
-			navigate('/');
-			handleMenuClose();
-		} else {
-			navigate('/login');
-			handleMenuClose();
-		}
-	};
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
+	const login = () => {
+		handleClick();
+		handleMenuClose();
+	}
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
   };
 
   const menuId = 'primary-search-account-menu';
@@ -96,7 +65,7 @@ const AppBarPage = () => {
 				Profile
 			</MenuItem>
       { (sessionHandle || !userToken) && (
-					<MenuItem onClick={ handleClick }>
+					<MenuItem onClick={ login }>
 						{ sessionHandle ? 'Logout' : 'Login' }
 					</MenuItem>
 				) 
@@ -108,7 +77,6 @@ const AppBarPage = () => {
       <AppBar position='sticky' color='primary'>
         <Toolbar>
           <Typography
-						onClick={ handleTitleClick }
             variant='h6'
             noWrap
             component='div'

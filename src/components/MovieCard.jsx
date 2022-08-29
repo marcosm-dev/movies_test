@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { 
 	CardActions,
 	Grid, CardMedia, 
@@ -9,8 +10,12 @@ import {
 	CardHeader
 } from '@mui/material';
 import moment from 'moment';
+import useMovies from '../hooks/useMovies';
 
 const MovieCard = ({ movie, setMovie }) => {
+	const session = localStorage.getItem('SessionHandle');
+	const sessionHandle = useMemo(() => !!session, [session]);
+
 	const navigate = useNavigate();
 	const { VITE_API_IMG_URI } = import.meta.env;
 
@@ -33,35 +38,47 @@ const MovieCard = ({ movie, setMovie }) => {
 	}
 
   return (
-		<Grid item lg={4} md={5} sm={8} xs={16}>
+		<Grid item lg={4} md={6} sm={6} xs={12}>
 		<Card onClick={handleClick} sx={{ maxHeight: 300, cursor: 'pointer' }}>
       <CardHeader
 				sx={{ color: '#002884' }}
         title={title}
         subheader={moment(release_date).format('LL')}
       />
+			 <Typography
+			 		variant='div'
+					style={{
+						display: 'flex',
+						alignItem: '',
+						justifyContent: ''
+					}}
+				>
       <CardMedia
+				height={200}
+				sx={{ objectFit: 'scale-down', maxHeight: 200, paddingLeft: 2, left: 0 }}
         component='img'
-        height={100}
-				sx={{ maxHeight: 80 }}
         image={`${VITE_API_IMG_URI}${poster_path}`}
         alt='Movie Card'
       />
-      <CardContent sx={{ height: '60px', overflow: 'hidden' }}>
-        <Typography variant='body2' color='text.secondary'>
+      <CardContent sx={{ height: 160, overflow: 'hidden' }}>
+        <Typography variant='body2' color='text.secondary' textOverflow='ellipsis'>
           { overview }
         </Typography>
       </CardContent>
+			</Typography>
 			<CardActions disableSpacing>
-			<Rating
-				name='text-feedback'
-				max={5}
-				onChange={(event, newValue) => {
-					handleRating(newValue);
-				}}
-				value={vote_average / 2}
-				precision={0.5}
-			/>
+			{
+				sessionHandle &&
+					<Rating
+					name='text-feedback'
+					max={5}
+					onChange={(event, newValue) => {
+						handleRating(newValue);
+					}}
+					value={vote_average / 2}
+					precision={0.5}
+				/>
+			}
 			<Typography 
 				variant='span' 
 				color='primary' 

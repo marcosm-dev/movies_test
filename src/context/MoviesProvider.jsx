@@ -1,5 +1,4 @@
 import { useMemo, createContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { 
 		mergeMap, 
 		map, 
@@ -22,45 +21,51 @@ const MoviesContext = createContext();
 const { VITE_API_KEY, VITE_API_URI } = import.meta.env;
 
 const MoviesProvider = ({ children }) => {
-	const params = useParams();
 	const token = localStorage.getItem('token');
 	const session = localStorage.getItem('SessionHandle');
 	const [ movie, setMovie ] = useState({});
+	const [ movies, setMovies ] = useState({});
+	const [ page, setPage ] = useState(1);
 
+	const handlePage = (e, val) => {
+		setPage(val);
+	}
 	const userToken = useMemo(() => !!token, [token])
-	const sessionHandle = useMemo(() => !!session);
-	
-  /* Consultar API "Movies" y alamacenar en el state */
+	const sessionHandle = useMemo(() => !!session, []);
+
+	/* Establecer un temporizador para evitar el parpadeo y obtener los datos */
 	function customFetch(URL) {
-		// wait for both fetch and a 500ms timer to finish
 		return zip(
 			ajax.getJSON(URL).pipe( map(r => r) ),
 			timer(500) // set a timer for 500ms
 		).pipe(
-			// then take only the first value (fetch result)
 			map(([data]) => data)
-		)
-	};
-
+			)
+		};
+		
+	/* Consultar API "Movies" y alamacenar en el state */
   const movies$ = useMemo(
-    () => customFetch(`${VITE_API_URI}/movie/popular?api_key=${VITE_API_KEY}`)
+    () => customFetch(`${VITE_API_URI}/movie/popular?api_key=${VITE_API_KEY}&page=${page}`)
         .pipe(
-          map(data => (
-						<>
-							{ data.results.map(movie => (
-										<MovieCard 
-											key={movie.id}
-											movie={movie}
-											setMovie={setMovie}
-										/>
-								)) 
-							}
-						</>
-          )),
+          map(data => {
+						setMovies(data);
+						return (
+							<>
+								{ data.results.map(movie => (
+											<MovieCard 
+												key={movie.id}
+												movie={movie}
+												setMovie={setMovie}
+											/>
+									)) 
+								}
+							</>
+						)
+					}),
           catchError(() => of(<div>ERROR</div>)),
           startWith(<Spinner />)
         ),
-	[]);
+	[page]);
 
 
 	const movie$ = useMemo(
@@ -75,11 +80,15 @@ const MoviesProvider = ({ children }) => {
   return (
     <MoviesContext.Provider 
 			value={{ 
-				movie, 
-				movies$, 
+				movie,
+				movies,
 				movie$,
+				movies$, 
 				userToken,
-				sessionHandle
+				sessionHandle,
+				handlePage,
+				page,
+				setPage
 			}}>
       	{children}
     </MoviesContext.Provider>

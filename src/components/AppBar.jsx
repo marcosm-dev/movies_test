@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import useAuth from '../hooks/useAuth'
 
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
@@ -14,23 +15,29 @@ import {
 	Typography,
 	Menu,
 	MenuItem,
+	Snackbar,
 } from '@mui/material';
 import LoginPage from './LoginPage';
 
 const AppBarPage = () => {
+	const { open, setOpen } = useAuth();
 	const { VITE_API_URI, VITE_API_KEY } = import.meta.env;
 	const session = localStorage.getItem('SessionHandle');
+	const token = localStorage.getItem('token');
 	const navigate = useNavigate();
   const [ anchorEl, setAnchorEl ] = useState(null);
   const [ mobileMoreAnchorEl, setMobileMoreAnchorEl ] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
 	const sessionHandle = useMemo(() => !!session, [session])
+	const userToken = useMemo(() => !!token, [token])
 
 	async function logout () {
-		const { data } = await axios.delete(`${VITE_API_URI}/authentication/session?api_key=${VITE_API_KEY}`, { session_id: session })
+		const params = { session_id: session };
+		const { data } = await axios.delete(`${VITE_API_URI}/authentication/session?api_key=${VITE_API_KEY}`, {
+			params,
+		});
 		localStorage.clear();
 		return data;
 	}
@@ -41,8 +48,8 @@ const AppBarPage = () => {
 
 	const handleClick = async () => {
 		if (sessionHandle) {
-			const { data } = await logout()
-			console.log(data);
+			const data = await logout()
+			if (data.success) setOpen(true);
 			navigate('/');
 			handleMenuClose();
 		} else {
@@ -88,7 +95,7 @@ const AppBarPage = () => {
       <MenuItem onClick={ handleMenuClose } disabled>
 				Profile
 			</MenuItem>
-      { sessionHandle && (
+      { (sessionHandle || !userToken) && (
 					<MenuItem onClick={ handleClick }>
 						{ sessionHandle ? 'Logout' : 'Login' }
 					</MenuItem>
@@ -98,16 +105,19 @@ const AppBarPage = () => {
   );
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position='sticky' color='secondary'>
+      <AppBar position='sticky' color='primary'>
         <Toolbar>
           <Typography
 						onClick={ handleTitleClick }
             variant='h6'
             noWrap
             component='div'
+						fontFamily='tahoma'
             sx={{ fontSize: { xs: 12, sm: 16 } }}
           >
-            MOVIES TEST
+            <Link to='/' className='link-header'>
+							MOVIES TEST
+						</Link>
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box>

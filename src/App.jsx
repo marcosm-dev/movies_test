@@ -1,20 +1,31 @@
-import React from 'react'
-import { Container, Typography } from '@mui/material'
-import { useState } from 'react'
-import { MoviesProvider } from './context/MoviesProvider'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { Container, Typography, Grid, Box } from '@mui/material';
+import { MoviesProvider } from './context/MoviesProvider';
+import AppLayout from './components/AppLayout';
+import MoviesPage from './components/MoviesPage';
+import MoviePage from './components/MoviePage';
+import LoginPage from './components/LoginPage';
+
 function App() {
 
   return (
-		<MoviesProvider>
-				<Container>
-					<header>
-						<Typography >
-								Movies
-						</Typography>
-					</header>
-				</Container>
-		</MoviesProvider>
-  )
+		<Router>
+		<Container>
+			<Box>
+				<MoviesProvider>
+					<Routes>
+						<Route path='/' element={<AppLayout />}>
+								<Route index element={<MoviesPage />} />
+								<Route path='/login' element={<LoginPage />} />
+								<Route path='/movie/:id' element={<MoviePage />} />
+						</Route>
+					</Routes>
+				</MoviesProvider>
+			</Box>
+		</Container>
+		</Router>
+	)
 }
 
-export default App
+export default App;

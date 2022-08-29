@@ -11,9 +11,15 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
+    "@mui/icons-material": "^5.10.2",
     "@mui/material": "^5.10.2",
+    "axios": "^0.27.2",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
+    "react-rxjs-elements": "^0.0.7",
+    "rxjs": "^7.5.6"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
